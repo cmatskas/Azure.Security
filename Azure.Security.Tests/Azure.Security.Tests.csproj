@@ -70,7 +70,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AzureBlobHelperTests.cs" />
-    <Compile Include="AzureTableCryptoTests.cs" />
+    <Compile Include="AzureCryptoTests.cs" />
+    <Compile Include="EncryptionHelperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RsaHelperTests.cs" />
     <Compile Include="SymmetricKeyTableManagerTests.cs" />
@@ -79,8 +80,12 @@
     <Content Include="TestFiles\TestCertificate.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="TestFiles\TestTextFile.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

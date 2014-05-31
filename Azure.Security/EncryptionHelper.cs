@@ -26,8 +26,11 @@
             StorageAccount = CloudStorageAccount.Parse(connectionString);
             RsaHelper = new RsaHelper(certificatePath, certificateValue);
             KeyTableManager = new SymmetricKeyTableManager(certificateTable, StorageAccount);
+            
             //Ensure the table is in place before initializing the cryptoStore
             CreateCertificateTableIfNotExists();
+            //Create the master key if it doesn't exist
+            CreateNewCryptoKeyIfNotExists();
 
             KeyCache = new SymmetricKeyCache(RsaHelper, KeyTableManager);
             AzureCrypto = new AzureCrypto(KeyCache);

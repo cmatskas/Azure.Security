@@ -1,5 +1,5 @@
 *.suo
 *.ncrunchproject
-**/EF.GenericRepository.sln.ide
+**/Azure.Security.sln.ide
 **/bin
 **/obj

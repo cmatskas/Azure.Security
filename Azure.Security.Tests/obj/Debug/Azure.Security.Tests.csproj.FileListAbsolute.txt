@@ -61,3 +61,5 @@ C:\Users\christos.matskas\Documents\GitHub\Azure.Security\Azure.Security.Tests\b
 C:\Users\christos.matskas\Documents\GitHub\Azure.Security\Azure.Security.Tests\obj\Debug\Azure.Security.Tests.csprojResolveAssemblyReference.cache
 C:\Users\christos.matskas\Documents\GitHub\Azure.Security\Azure.Security.Tests\obj\Debug\Azure.Security.Tests.dll
 C:\Users\christos.matskas\Documents\GitHub\Azure.Security\Azure.Security.Tests\obj\Debug\Azure.Security.Tests.pdb
+C:\Users\christos.matskas\Documents\GitHub\Azure.Security\Azure.Security.Tests\bin\Debug\Azure.Security.Tests.dll.config
+C:\Users\christos.matskas\Documents\GitHub\Azure.Security\Azure.Security.Tests\bin\Debug\TestFiles\TestTextFile.txt
