@@ -1,0 +1,5 @@
+*.suo
+*.ncrunchproject
+**/EF.GenericRepository.sln.ide
+**/bin
+**/obj
