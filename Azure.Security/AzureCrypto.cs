@@ -4,12 +4,13 @@
     using System.Text;
     using System.Security.Cryptography;
     using System.IO;
+    using Interfaces;
 
-    public class AzureCrypto
+    public class AzureCrypto : ICrypto
     {
-        private static SymmetricKeyCache keyStore;
+        private static ISymmetricKeyCache keyStore;
 
-        public AzureCrypto(SymmetricKeyCache store)
+        public AzureCrypto(ISymmetricKeyCache store)
         {
             keyStore = store;
         }

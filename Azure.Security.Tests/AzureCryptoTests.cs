@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using Interfaces;
     using Security;
     using Exceptions;
     using FluentAssertions;
@@ -15,8 +16,8 @@
         private const string TableName = "TestTableName";
         private const string TestString = "This is some test value";
         private readonly CloudStorageAccount acct = CloudStorageAccount.Parse("UseDevelopmentStorage=true");
-        private static RsaHelper rsaHelper;
-        private static SymmetricKeyTableManager tableManager;
+        private static IRsaHelper rsaHelper;
+        private static ISymmetricKeyTableManager tableManager;
 
         public TestContext TestContext { get; set; }
 

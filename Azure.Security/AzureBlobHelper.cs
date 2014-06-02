@@ -4,10 +4,11 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using Interfaces;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Blob;
 
-    public class AzureBlobHelper
+    public class AzureBlobHelper : IBlobHelper
     {
         private static CloudStorageAccount storageAccount;
         private static CloudBlobContainer container;
@@ -23,14 +24,6 @@
             containerName = blobContainerName;
             storageAccount = account;
             InitializeStorageAcccountAndContainer();
-        }
-
-        private static void InitializeStorageAcccountAndContainer()
-        {
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            container = blobClient.GetContainerReference(containerName);
-
-            container.CreateIfNotExists();
         }
 
         public void DeleteBlobContainer(string toDelete = null)
@@ -116,6 +109,14 @@
         private static bool NameContailsUpperCaseCharacters(string stringToValidate)
         {
             return !string.IsNullOrEmpty(stringToValidate) && stringToValidate.Any(char.IsUpper);
+        }
+
+        private static void InitializeStorageAcccountAndContainer()
+        {
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            container = blobClient.GetContainerReference(containerName);
+
+            container.CreateIfNotExists();
         }
     }
 }

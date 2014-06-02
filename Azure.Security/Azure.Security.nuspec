@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Azure.Security</id>
+    <version>1.0</version>
+    <title>Azure.Security</title>
+    <authors>christos.matskas</authors>
+    <owners>christos.matskas</owners>
+    <projectUrl>https://github.com/cmatskas/Azure.Security</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>First version of Azure.Security</releaseNotes>
+    <copyright>Copyright 2014</copyright>
+    <tags>Azure Encryption Cryptography SSL</tags>
+  </metadata>
+</package>

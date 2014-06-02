@@ -3,3 +3,5 @@
 **/Azure.Security.sln.ide
 **/bin
 **/obj
+*.nupkg
+*.transform

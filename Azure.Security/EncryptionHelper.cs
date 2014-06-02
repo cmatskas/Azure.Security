@@ -3,22 +3,22 @@
     using System.Configuration;
     using System.IO;
     using System.Linq;
+    using Interfaces;
     using Microsoft.WindowsAzure.Storage;
 
-    public class EncryptionHelper
+    public class EncryptionHelper : IEncryptionHelper
     {
         public CloudStorageAccount StorageAccount { get; set; } 
-        public RsaHelper RsaHelper { get; set; }
-        public SymmetricKeyTableManager KeyTableManager { get; set; }
-        public SymmetricKeyCache KeyCache { get; set; }
-        public AzureCrypto AzureCrypto{ get; set; }
+        public IRsaHelper RsaHelper { get; set; }
+        public ISymmetricKeyTableManager KeyTableManager { get; set; }
+        public ISymmetricKeyCache KeyCache { get; set; }
+        public ICrypto AzureCrypto{ get; set; }
 
         private readonly string certificatePath;
         private readonly string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
         private readonly string certificateValue = ConfigurationManager.AppSettings["CertificateValue"];
         private readonly string certificateTable = ConfigurationManager.AppSettings["CertificateTable"];
         private readonly string certificateName = ConfigurationManager.AppSettings["CertificateName"];
-
 
         public EncryptionHelper(string pathToCertificate)
         {

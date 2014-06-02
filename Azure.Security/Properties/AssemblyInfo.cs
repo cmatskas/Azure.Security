@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Azure.Security")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Encryption provider for Azure Websites")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Azure.Security")]

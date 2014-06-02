@@ -67,6 +67,12 @@
     <Compile Include="AzureCrypto.cs" />
     <Compile Include="EncryptionHelper.cs" />
     <Compile Include="Exceptions\AzureTableCryptoException.cs" />
+    <Compile Include="Interfaces\IBlobHelper.cs" />
+    <Compile Include="Interfaces\ICrypto.cs" />
+    <Compile Include="Interfaces\IEncryptionHelper.cs" />
+    <Compile Include="Interfaces\IRsaHelper.cs" />
+    <Compile Include="Interfaces\ISymmetricKeyCache.cs" />
+    <Compile Include="Interfaces\ISymmetricKeyTableManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RsaHelper.cs" />
     <Compile Include="Serializer.cs" />
@@ -76,7 +82,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="Azure.Security.1.0.0.0.nupkg" />
     <None Include="packages.config" />
+    <None Include="web.config.transform" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,4 +1,4 @@
-﻿namespace Azure.Security.Test
+﻿namespace Azure.Security.Tests
 {
     using System.IO;
     using System.Security.Cryptography;

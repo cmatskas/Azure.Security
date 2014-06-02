@@ -5,14 +5,24 @@
     using System.Linq;
     using System.Security.Cryptography;
     using Exceptions;
+    using Interfaces;
 
-    public class SymmetricKeyCache
+    public class SymmetricKeyCache : ISymmetricKeyCache
     {
         private readonly List<SymmetricAlgorithm> keyCache = new List<SymmetricAlgorithm>();
+        private readonly ISymmetricKeyTableManager symmetricKeyTableManager;
+        private readonly IRsaHelper rsaHelper;
 
-        public SymmetricKeyCache(RsaHelper rsaHelper, SymmetricKeyTableManager keyTableManager)
+        public SymmetricKeyCache(IRsaHelper theRsaHelper, ISymmetricKeyTableManager keyTableManager)
         {
-            var allKeys = keyTableManager.GetAllKeys();
+            rsaHelper = theRsaHelper;
+            symmetricKeyTableManager = keyTableManager;
+            Init();
+        }
+
+        internal void Init()
+        {
+            var allKeys = symmetricKeyTableManager.GetAllKeys();
 
             foreach (var key in allKeys)
             {
@@ -21,7 +31,7 @@
                     var symmetricCryptoKey = rsaHelper.RsaDecryptToBytes(key.Key);
                     var symmetricCryptoIv = rsaHelper.RsaDecryptToBytes(key.Iv);
 
-                    var algorithm = new AesManaged {IV = symmetricCryptoIv, Key = symmetricCryptoKey};
+                    var algorithm = new AesManaged { IV = symmetricCryptoIv, Key = symmetricCryptoKey };
                     keyCache.Add(algorithm);
                 }
                 catch (Exception ex)
@@ -31,12 +41,12 @@
             }
         }
 
-        internal ICryptoTransform GetDecryptor()
+        public ICryptoTransform GetDecryptor()
         {
             return GetAlgorithm().CreateDecryptor();
         }
 
-        internal ICryptoTransform GetEncryptor()
+        public ICryptoTransform GetEncryptor()
         {
             return GetAlgorithm().CreateEncryptor();
         }

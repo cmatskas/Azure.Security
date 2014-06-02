@@ -4,8 +4,9 @@
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
     using System.Text;
+    using Interfaces;
 
-    public class RsaHelper
+    public class RsaHelper : IRsaHelper
     {
         private static readonly UnicodeEncoding ByteConverter = new UnicodeEncoding();
         private X509Certificate2 x509;

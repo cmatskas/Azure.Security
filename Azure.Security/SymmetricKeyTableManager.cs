@@ -5,19 +5,18 @@
     using System.Data.Services.Client;
     using System.Linq;
     using Exceptions;
+    using Interfaces;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
 
-    public class SymmetricKeyTableManager
+    public class SymmetricKeyTableManager : ISymmetricKeyTableManager
     {
         private static string keyTableName;
-        private readonly CloudStorageAccount storageAccount;
         private readonly CloudTableClient tableClient;
 
-        public SymmetricKeyTableManager(string tableName, CloudStorageAccount acct)
+        public SymmetricKeyTableManager(string tableName, CloudStorageAccount storageAccount)
         {
             keyTableName = tableName;
-            storageAccount = acct;
             tableClient = storageAccount.CreateCloudTableClient();
         }
 
