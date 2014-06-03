@@ -5,7 +5,43 @@ A C# encryption provider that has been designed to work around the shortcomings 
 
 The fundamental problem arises from the fact that Azure Websites run on a shared environment where managing encryption key is hard to achieve without introducing security weaknesses. Although some people may suggest that the proposed implementation is not perfect and there are still small pitfalls, at least you have a solid, pluggable and easy to configure Encryption provider for your Azure Websites. The Encryption helper uses a combination of SSL keys, AES Cryptographic keys, Blob and Table storage to create and manage the keys necessary fo encrypt and decrypt data.
 
-In order to get the Encryption provider to work, your project will need to provide an SSL key. This doesn't have to be a commercial key that you acquire from a vendor, so even self-signed keys work just fine.
+In order to get the Encryption provider to work, your project will need to provide an SSL key. This doesn't have to be a commercially acquired SSL key so even self-signed keys can do the job.
 
-I will provide full details on how to set up and call the EncryptionHelper but in the meantime, if you cannot wait for the blog post and instructions, feel free to dive into the unit tests and have a go yourselves.
+For full details about the project and how to install and use Azure.Security you can go [here](https://cmatskas.com/a-c-encryption-provider-for-azure-websites/)
+
+###Quick Guide###
+
+1. Add the SSL certificate file to your solution
+2. Create a storage account in Azure, if you don't have one already
+3. Install the Azure.Security Nuget package
+4. Configure the web.config variables accordingly
+
+In your code, instantiate an instance of EncryptionHelper in your startup routine in order to generate the necessary table and blob container.
+
+Example in Global.asax
+```
+protected void Application_Start()
+{
+ 	//other code omitted
+ 
+ 	var certificatePath = Server.MapPath("~/App_Data");
+ 	var encryptionHelper = new EncryptionHelper(certificatePath);
+ 	encryptionHelper.CreateNewCryptoKeyIfNotExists();
+}
+```
+
+Then, whenever you want to encrypt or decrypt data, just instantiate an EncryptionHelper class and call the appropriate methods.
+
+Example
+```
+// ... other code omitted
+var encryptionHelper = new EncryptionHelper("pathToCertificateFile");
+var encryptedString = encryptionHelper.EncryptAndBase64("test string");
+
+var decryptedString = encryptionHelper.DecryptFromBase64(encryptedString);
+```
+
+The EncryptionHelper can encrypt/decrypt strings and byte[] (i.e. streams)
+
+For more details, you can either visit my blog post or dive into the unit tests.
 
