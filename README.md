@@ -1,6 +1,8 @@
 Azure.Security
 ==============
 
+**Build Status** : [![Build status](https://ci.appveyor.com/api/projects/status/fyb9bs6e2d8w8xtn)](https://ci.appveyor.com/project/cmatskas/azure-security)
+
 A C# encryption provider that has been designed to work around the shortcomings of the Windows Azure platform.
 
 The fundamental problem arises from the fact that Azure Websites run on a shared environment where managing encryption key is hard to achieve without introducing security weaknesses. Although some people may suggest that the proposed implementation is not perfect and there are still small pitfalls, at least you have a solid, pluggable and easy to configure Encryption provider for your Azure Websites. The Encryption helper uses a combination of SSL keys, AES Cryptographic keys, Blob and Table storage to create and manage the keys necessary fo encrypt and decrypt data.
