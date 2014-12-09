@@ -1,6 +1,8 @@
 Azure.Security
 ==============
 
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/cmatskas/Azure.Security?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 **Build Status** : [![Build status](https://ci.appveyor.com/api/projects/status/fyb9bs6e2d8w8xtn)](https://ci.appveyor.com/project/cmatskas/azure-security)
 
 A C# encryption provider designed specifically to work around the shortcomings of the Windows Azure platform.
