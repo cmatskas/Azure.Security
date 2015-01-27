@@ -5,6 +5,7 @@
 **/obj
 *.nupkg
 *.transform
+**/packages
 
 **/Azure.Security.Tests/bin
 
