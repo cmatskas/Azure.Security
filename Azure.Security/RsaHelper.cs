@@ -13,13 +13,18 @@
 
         public RsaHelper(string certificatePath, string password)
         {
-            CreateX509CertificateFromCerFile(certificatePath, password);
+            CreateX509CertificateFromCerFile(certificatePath, password, X509KeyStorageFlags.DefaultKeySet);
         }
 
-        private void CreateX509CertificateFromCerFile(string certificateFilePath, string password)
+        public RsaHelper(string certificatePath, string password, X509KeyStorageFlags flag)
+        {
+            CreateX509CertificateFromCerFile(certificatePath, password, flag);
+        }
+
+        private void CreateX509CertificateFromCerFile(string certificateFilePath, string password, X509KeyStorageFlags flag)
         {
             var data = File.ReadAllBytes(certificateFilePath);
-            x509 = new X509Certificate2(data, password);
+            x509 = new X509Certificate2(data, password, flag);
         }
 
         public byte[] RsaEncryptString(string plainText)
