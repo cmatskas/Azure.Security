@@ -1,0 +1,9 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+   <appSettings>
+    <add key="StorageConnectionString" xdt:Transform="Remove" xdt:Locator="Match(name)" />
+    <add key="CertificateValue" xdt:Transform="Remove" xdt:Locator="Match(name)" />
+    <add key="CertificateTable" xdt:Transform="Remove" xdt:Locator="Match(name)" />
+    <add key="CertificateName" xdt:Transform="Remove" xdt:Locator="Match(name)" />
+  </appSettings>
+</configuration>
