@@ -81,6 +81,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RsaHelper.cs" />
     <Compile Include="Serializer.cs" />
+    <Compile Include="SymmetricAlgorithmItem.cs" />
     <Compile Include="SymmetricKey.cs" />
     <Compile Include="SymmetricKeyCache.cs" />
     <Compile Include="SymmetricKeyTableManager.cs" />

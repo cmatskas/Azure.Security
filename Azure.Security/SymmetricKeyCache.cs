@@ -9,7 +9,7 @@
 
     public class SymmetricKeyCache : ISymmetricKeyCache
     {
-        private readonly List<SymmetricAlgorithm> keyCache = new List<SymmetricAlgorithm>();
+        private readonly List<SymmetricAlgorithmItem> keyCache = new List<SymmetricAlgorithmItem>();
         private readonly ISymmetricKeyTableManager symmetricKeyTableManager;
         private readonly IRsaHelper rsaHelper;
 
@@ -31,7 +31,11 @@
                     var symmetricCryptoKey = rsaHelper.RsaDecryptToBytes(key.Key);
                     var symmetricCryptoIv = rsaHelper.RsaDecryptToBytes(key.Iv);
 
-                    var algorithm = new AesManaged { IV = symmetricCryptoIv, Key = symmetricCryptoKey };
+                    var algorithm = new SymmetricAlgorithmItem
+                    {
+                        Algorithm = new AesManaged {IV = symmetricCryptoIv, Key = symmetricCryptoKey},
+                        UserId = key.UserId
+                    };
                     keyCache.Add(algorithm);
                 }
                 catch (Exception ex)
@@ -41,23 +45,23 @@
             }
         }
 
-        public ICryptoTransform GetDecryptor()
+        public ICryptoTransform GetDecryptor(Guid userId)
         {
-            return GetAlgorithm().CreateDecryptor();
+            return GetAlgorithm(userId).CreateDecryptor();
         }
 
-        public ICryptoTransform GetEncryptor()
+        public ICryptoTransform GetEncryptor(Guid userId)
         {
-            return GetAlgorithm().CreateEncryptor();
+            return GetAlgorithm(userId).CreateEncryptor();
         }
 
-        private SymmetricAlgorithm GetAlgorithm()
+        private SymmetricAlgorithm GetAlgorithm(Guid userId)
         {
-            if (!keyCache.Any())
+            if (keyCache.All(x => x.UserId != userId))
             {
                 throw new AzureCryptoException("No keys have been configured.");
             }
-            return keyCache.First();
+            return keyCache.Single(x => x.UserId == userId).Algorithm;
         }
     }
 }

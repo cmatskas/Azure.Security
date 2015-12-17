@@ -15,24 +15,24 @@
             keyStore = store;
         }
 
-        public string EncryptStringAndBase64(string s)
+        public string EncryptStringAndBase64(string s, Guid userId)
         {
             var bytes = Encoding.Unicode.GetBytes(s);
-            var cryptedBytes = Encrypt(bytes);
+            var cryptedBytes = Encrypt(bytes, userId);
             return Convert.ToBase64String(cryptedBytes);
         }
 
-        public string DecryptStringFromBase64(string base64String)
+        public string DecryptStringFromBase64(string base64String, Guid userId)
         {
-            var bytes = Decrypt(Convert.FromBase64String(base64String));
+            var bytes = Decrypt(Convert.FromBase64String(base64String), userId);
             return Encoding.Unicode.GetString(bytes);
         }
 
-        public byte[] Encrypt(byte[] bytes)
+        public byte[] Encrypt(byte[] bytes, Guid userId)
         {
             using (var msEncrypted = new MemoryStream())
             {
-                using (var encryptor = keyStore.GetEncryptor())
+                using (var encryptor = keyStore.GetEncryptor(userId))
                 {
                     using (var csEncrypt = new CryptoStream(msEncrypted, encryptor, CryptoStreamMode.Write))
                     {
@@ -47,9 +47,9 @@
             }
         }
 
-        public byte[] Decrypt(byte[] bytes)
+        public byte[] Decrypt(byte[] bytes, Guid userId)
         {
-            using (var decryptor = keyStore.GetDecryptor())
+            using (var decryptor = keyStore.GetDecryptor(userId))
             {
                 using (var msDecrypted = new MemoryStream())
                 {
@@ -62,14 +62,14 @@
             }
         }
 
-        public ICryptoTransform GetEncryptor()
+        public ICryptoTransform GetEncryptor(Guid userId)
         {
-            return keyStore.GetEncryptor();
+            return keyStore.GetEncryptor(userId);
         }
 
-        public ICryptoTransform GetDecryptor()
+        public ICryptoTransform GetDecryptor(Guid userId)
         {
-            return keyStore.GetDecryptor();
+            return keyStore.GetDecryptor(userId);
         }
     }
 }

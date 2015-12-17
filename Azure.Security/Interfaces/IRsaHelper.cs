@@ -1,5 +1,7 @@
 ﻿namespace Azure.Security.Interfaces
 {
+    using System;
+
     public interface IRsaHelper
     {
         byte[] RsaEncryptString(string plainText);
@@ -10,6 +12,6 @@
 
         string RsaDecryptToString(byte[] dataToDecrypt);
 
-        SymmetricKey CreateNewAesSymmetricKeyset();
+        SymmetricKey CreateNewAesSymmetricKeyset(Guid userId);
     }
 }

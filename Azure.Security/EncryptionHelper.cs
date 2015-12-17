@@ -1,5 +1,6 @@
 ﻿namespace Azure.Security
 {
+    using System;
     using System.Configuration;
     using System.IO;
     using System.Linq;
@@ -20,7 +21,7 @@
         private readonly string certificateTable = ConfigurationManager.AppSettings["CertificateTable"];
         private readonly string certificateName = ConfigurationManager.AppSettings["CertificateName"];
 
-        public EncryptionHelper(string pathToCertificate)
+        public EncryptionHelper(string pathToCertificate, Guid userId)
         {
             certificatePath = Path.Combine(pathToCertificate,certificateName);
             StorageAccount = CloudStorageAccount.Parse(connectionString);
@@ -30,42 +31,42 @@
             //Ensure the table is in place before initializing the cryptoStore
             CreateCertificateTableIfNotExists();
             //Create the master key if it doesn't exist
-            CreateNewCryptoKeyIfNotExists();
+            CreateNewCryptoKeyIfNotExists(userId);
 
             KeyCache = new SymmetricKeyCache(RsaHelper, KeyTableManager);
             AzureCrypto = new AzureCrypto(KeyCache);
         }
 
-        public void CreateNewCryptoKeyIfNotExists()
+        public void CreateNewCryptoKeyIfNotExists(Guid userId)
         {
             var allKeys = KeyTableManager.GetAllKeys().ToList();
-            if (allKeys.Any())
+            if (allKeys.All(x => x.UserId != userId))
             {
                 return;
             }
 
-            var newKey = RsaHelper.CreateNewAesSymmetricKeyset();
+            var newKey = RsaHelper.CreateNewAesSymmetricKeyset(userId);
             KeyTableManager.AddSymmetricKey(newKey);
         }
 
-        public byte[] EncryptBytes(byte[] bytesToEncrypt)
+        public byte[] EncryptBytes(byte[] bytesToEncrypt, Guid userId)
         {
-            return AzureCrypto.Encrypt(bytesToEncrypt);
+            return AzureCrypto.Encrypt(bytesToEncrypt, userId);
         }
 
-        public byte[] DecryptBytes(byte[] bytesToDecrypt)
+        public byte[] DecryptBytes(byte[] bytesToDecrypt, Guid userId)
         {
-            return AzureCrypto.Decrypt(bytesToDecrypt);
+            return AzureCrypto.Decrypt(bytesToDecrypt, userId);
         }
 
-        public string EncryptAndBase64(string valueToEncrypt)
+        public string EncryptAndBase64(string valueToEncrypt, Guid userId)
         {
-            return AzureCrypto.EncryptStringAndBase64(valueToEncrypt);
+            return AzureCrypto.EncryptStringAndBase64(valueToEncrypt, userId);
         }
 
-        public string DecryptFromBase64(string valueToDecrypt)
+        public string DecryptFromBase64(string valueToDecrypt, Guid userId)
         {
-            return AzureCrypto.DecryptStringFromBase64(valueToDecrypt);
+            return AzureCrypto.DecryptStringFromBase64(valueToDecrypt, userId);
         }
 
         private void CreateCertificateTableIfNotExists()

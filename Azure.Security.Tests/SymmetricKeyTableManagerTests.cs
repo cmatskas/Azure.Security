@@ -13,6 +13,7 @@
     public class SymmetricKeyTableManagerTests
     {
         private const string TableName = "RandomTableName";
+        private static readonly Guid TestUserId = new Guid("e6f41e92-a89f-47ab-b511-224260f3bb55");
         private readonly CloudStorageAccount acct = CloudStorageAccount.Parse("UseDevelopmentStorage=true");
         private static RsaHelper rsaHelper;
 
@@ -65,7 +66,7 @@
         {
             var symmetricTableManager = new SymmetricKeyTableManager(TableName, acct);
             symmetricTableManager.CreateTableIfNotExists();
-            var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
+            var newKey = rsaHelper.CreateNewAesSymmetricKeyset(TestUserId);
             symmetricTableManager.AddSymmetricKey(newKey);
 
             var allKeys = symmetricTableManager.GetAllKeys().ToList();
@@ -79,7 +80,7 @@
         {
             var symmetricTableManager = new SymmetricKeyTableManager(TableName, acct);
             symmetricTableManager.CreateTableIfNotExists();
-            var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
+            var newKey = rsaHelper.CreateNewAesSymmetricKeyset(TestUserId);
             symmetricTableManager.AddSymmetricKey(newKey);
 
             var allKeys = symmetricTableManager.GetAllKeys().ToList();

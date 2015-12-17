@@ -1,5 +1,6 @@
 ﻿namespace Azure.Security
 {
+    using System;
     using System.IO;
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
@@ -50,7 +51,7 @@
             return ByteConverter.GetString(RsaDecryptToBytes(dataToDecrypt));
         }
 
-        public SymmetricKey CreateNewAesSymmetricKeyset()
+        public SymmetricKey CreateNewAesSymmetricKeyset(Guid userId)
         {
             var aes = new AesManaged();
             aes.GenerateIV();
@@ -59,7 +60,8 @@
             var symmKeySet = new SymmetricKey()
             {
                 Iv = RsaEncryptBytes(aes.IV),
-                Key = RsaEncryptBytes(aes.Key)
+                Key = RsaEncryptBytes(aes.Key),
+                UserId = userId
             };
 
             return symmKeySet;

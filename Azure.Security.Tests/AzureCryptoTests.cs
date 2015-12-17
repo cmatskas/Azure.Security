@@ -15,6 +15,7 @@
     {
         private const string TableName = "TestTableName";
         private const string TestString = "This is some test value";
+        private static readonly Guid TestUserId = new Guid("e6f41e92-a89f-47ab-b511-224260f3bb55");
         private readonly CloudStorageAccount acct = CloudStorageAccount.Parse("UseDevelopmentStorage=true");
         private static IRsaHelper rsaHelper;
         private static ISymmetricKeyTableManager tableManager;
@@ -51,34 +52,34 @@
 
             var c = new AzureCrypto(keyStore);
 
-            Action action = () => c.GetEncryptor();
+            Action action = () => c.GetEncryptor(TestUserId);
             action.ShouldThrow<AzureCryptoException>();
         }
 
         [TestMethod]
         public void TestAzureTableCryptoHasValidEncryptor()
         {
-            var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
+            var newKey = rsaHelper.CreateNewAesSymmetricKeyset(TestUserId);
             tableManager.AddSymmetricKey(newKey);
 
             var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
             var c = new AzureCrypto(keyStore);
             c.Should().NotBeNull("At this stage the contstructor should have succeeded");
 
-            var encryptor = c.GetEncryptor();
+            var encryptor = c.GetEncryptor(TestUserId);
             encryptor.Should().NotBeNull("Because the keystore is initialized and there is a key");
         }
 
         [TestMethod]
         public void EncryptionShouldWorkAsExpected()
         {
-            var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
+            var newKey = rsaHelper.CreateNewAesSymmetricKeyset(TestUserId);
             tableManager.AddSymmetricKey(newKey);
 
             var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
             var c = new AzureCrypto(keyStore);
 
-            var encryptedString = c.EncryptStringAndBase64(TestString);
+            var encryptedString = c.EncryptStringAndBase64(TestString, TestUserId);
             encryptedString.Should().NotBeNullOrEmpty("Because the encryption failed");
             encryptedString.Should().NotMatch(TestString);
         }
@@ -86,14 +87,14 @@
         [TestMethod]
         public void DecryptionShouldReturnTheOriginalString()
         {
-            var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
+            var newKey = rsaHelper.CreateNewAesSymmetricKeyset(TestUserId);
             tableManager.AddSymmetricKey(newKey);
 
             var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
             var c = new AzureCrypto(keyStore);
 
-            var encryptedString = c.EncryptStringAndBase64(TestString);
-            var decryptedString = c.DecryptStringFromBase64(encryptedString);
+            var encryptedString = c.EncryptStringAndBase64(TestString, TestUserId);
+            var decryptedString = c.DecryptStringFromBase64(encryptedString, TestUserId);
 
             decryptedString.ShouldBeEquivalentTo(TestString);
         }
