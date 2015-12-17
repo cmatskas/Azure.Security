@@ -12,6 +12,8 @@
 
         string RsaDecryptToString(byte[] dataToDecrypt);
 
-        SymmetricKey CreateNewAesSymmetricKeyset(Guid userId);
+        SymmetricKey CreateNewAesSymmetricKeyset();
+
+        SymmetricKey CreateNewAesSymmetricKeyset(Guid? userId);
     }
 }

@@ -40,6 +40,16 @@
         [TestMethod]
         public void TestEncryptStringShouldSucceed()
         {
+            var encryptionHelper = new EncryptionHelper(testFileDeploymentDirectory);
+            var encryptedString = encryptionHelper.EncryptAndBase64(TestString);
+
+            encryptedString.Should().NotBeNullOrEmpty("Encryptiong failed");
+            encryptedString.Length.Should().BeGreaterThan(0, "Encryption failed");
+        }
+
+        [TestMethod]
+        public void TestEncryptStringShouldSucceedWithUserId()
+        {
             var encryptionHelper = new EncryptionHelper(testFileDeploymentDirectory, TestUserId);
             var encryptedString = encryptionHelper.EncryptAndBase64(TestString, TestUserId);
 
@@ -49,6 +59,18 @@
 
         [TestMethod]
         public void TestDecryptStringShouldSucceed()
+        {
+            var encryptionHelper = new EncryptionHelper(testFileDeploymentDirectory);
+            var encryptedString = encryptionHelper.EncryptAndBase64(TestString);
+            var decryptedString = encryptionHelper.DecryptFromBase64(encryptedString);
+
+            decryptedString.Should().NotBeNullOrEmpty("Encryptiong failed");
+            decryptedString.Length.Should().BeGreaterThan(0, "Encryption failed");
+            decryptedString.ShouldBeEquivalentTo(TestString);
+        }
+
+        [TestMethod]
+        public void TestDecryptStringShouldSucceedWithUserId()
         {
             var encryptionHelper = new EncryptionHelper(testFileDeploymentDirectory, TestUserId);
             var encryptedString = encryptionHelper.EncryptAndBase64(TestString, TestUserId);
@@ -62,6 +84,16 @@
         [TestMethod]
         public void TestEncryptBinaryShouldSucceed()
         {
+            var encryptionHelper = new EncryptionHelper(testFileDeploymentDirectory);
+            var bytesToEncrypt = File.ReadAllBytes(Path.Combine(testFileDeploymentDirectory, TestFileName));
+            var encryptedBytes = encryptionHelper.EncryptBytes(bytesToEncrypt);
+
+            encryptedBytes.Should().NotBeNull("EncryptionFailed");
+        }
+
+        [TestMethod]
+        public void TestEncryptBinaryShouldSucceedWithUserId()
+        {
             var encryptionHelper = new EncryptionHelper(testFileDeploymentDirectory, TestUserId);
             var bytesToEncrypt = File.ReadAllBytes(Path.Combine(testFileDeploymentDirectory, TestFileName));
             var encryptedBytes = encryptionHelper.EncryptBytes(bytesToEncrypt, TestUserId);
@@ -71,6 +103,23 @@
 
         [TestMethod]
         public void TestDecryptBinaryShouldSucceed()
+        {
+            var pathToTestFile = Path.Combine(testFileDeploymentDirectory, TestFileName);
+            var encryptionHelper = new EncryptionHelper(testFileDeploymentDirectory);
+            var bytesToEncrypt = File.ReadAllBytes(pathToTestFile);
+            var encryptedBytes = encryptionHelper.EncryptBytes(bytesToEncrypt);
+
+            var decryptedBytes = encryptionHelper.DecryptBytes(encryptedBytes);
+            decryptedBytes.Should().NotBeNull("EncryptionFailed");
+
+            var decryptedTestContent = System.Text.Encoding.UTF8.GetString(decryptedBytes);
+            var originalContent = File.ReadAllText(pathToTestFile);
+
+            Assert.IsTrue(decryptedTestContent.Equals(originalContent, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        [TestMethod]
+        public void TestDecryptBinaryShouldSucceedWithUserId()
         {
             var pathToTestFile = Path.Combine(testFileDeploymentDirectory, TestFileName);
             var encryptionHelper = new EncryptionHelper(testFileDeploymentDirectory, TestUserId);

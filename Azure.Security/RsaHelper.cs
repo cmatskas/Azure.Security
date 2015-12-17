@@ -51,13 +51,18 @@
             return ByteConverter.GetString(RsaDecryptToBytes(dataToDecrypt));
         }
 
-        public SymmetricKey CreateNewAesSymmetricKeyset(Guid userId)
+        public SymmetricKey CreateNewAesSymmetricKeyset()
+        {
+            return CreateNewAesSymmetricKeyset(null);
+        }
+
+        public SymmetricKey CreateNewAesSymmetricKeyset(Guid? userId)
         {
             var aes = new AesManaged();
             aes.GenerateIV();
             aes.GenerateKey();
 
-            var symmKeySet = new SymmetricKey()
+            var symmKeySet = new SymmetricKey
             {
                 Iv = RsaEncryptBytes(aes.IV),
                 Key = RsaEncryptBytes(aes.Key),

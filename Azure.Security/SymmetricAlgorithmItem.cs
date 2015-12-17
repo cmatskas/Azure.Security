@@ -7,6 +7,7 @@ namespace Azure.Security
     public class SymmetricAlgorithmItem
     {
         public SymmetricAlgorithm Algorithm { get; set; }
-        public Guid UserId { get; set; }
+
+        public Guid? UserId { get; set; }
     }
 }

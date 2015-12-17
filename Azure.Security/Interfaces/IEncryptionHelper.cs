@@ -4,14 +4,24 @@
 
     public interface IEncryptionHelper
     {
-        void CreateNewCryptoKeyIfNotExists(Guid userId);
+        void CreateNewCryptoKeyIfNotExists();
 
-        byte[] EncryptBytes(byte[] bytesToEncrypt, Guid userId);
+        void CreateNewCryptoKeyIfNotExists(Guid? userId);
 
-        byte[] DecryptBytes(byte[] bytesToDecrypt, Guid userId);
+        byte[] EncryptBytes(byte[] bytesToEncrypt);
 
-        string EncryptAndBase64(string valueToEncrypt, Guid userId);
+        byte[] EncryptBytes(byte[] bytesToEncrypt, Guid? userId);
 
-        string DecryptFromBase64(string valueToDecrypt, Guid userId);
+        byte[] DecryptBytes(byte[] bytesToDecrypt);
+
+        byte[] DecryptBytes(byte[] bytesToDecrypt, Guid? userId);
+
+        string EncryptAndBase64(string valueToEncrypt);
+
+        string EncryptAndBase64(string valueToEncrypt, Guid? userId);
+
+        string DecryptFromBase64(string valueToDecrypt);
+
+        string DecryptFromBase64(string valueToDecrypt, Guid? userId);
     }
 }

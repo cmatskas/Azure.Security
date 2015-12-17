@@ -45,17 +45,27 @@
             }
         }
 
-        public ICryptoTransform GetDecryptor(Guid userId)
+        public ICryptoTransform GetDecryptor()
+        {
+            return GetDecryptor(null);
+        }
+
+        public ICryptoTransform GetDecryptor(Guid? userId)
         {
             return GetAlgorithm(userId).CreateDecryptor();
         }
 
-        public ICryptoTransform GetEncryptor(Guid userId)
+        public ICryptoTransform GetEncryptor()
+        {
+            return GetEncryptor(null);
+        }
+
+        public ICryptoTransform GetEncryptor(Guid? userId)
         {
             return GetAlgorithm(userId).CreateEncryptor();
         }
 
-        private SymmetricAlgorithm GetAlgorithm(Guid userId)
+        private SymmetricAlgorithm GetAlgorithm(Guid? userId)
         {
             if (keyCache.All(x => x.UserId != userId))
             {

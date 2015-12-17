@@ -52,12 +52,37 @@
 
             var c = new AzureCrypto(keyStore);
 
+            Action action = () => c.GetEncryptor();
+            action.ShouldThrow<AzureCryptoException>();
+        }
+
+        [TestMethod]
+        public void TestAzureTableCryptoThrowsTableNotFoundExceptionWithUserId()
+        {
+            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
+
+            var c = new AzureCrypto(keyStore);
+
             Action action = () => c.GetEncryptor(TestUserId);
             action.ShouldThrow<AzureCryptoException>();
         }
 
         [TestMethod]
         public void TestAzureTableCryptoHasValidEncryptor()
+        {
+            var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
+            tableManager.AddSymmetricKey(newKey);
+
+            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
+            var c = new AzureCrypto(keyStore);
+            c.Should().NotBeNull("At this stage the contstructor should have succeeded");
+
+            var encryptor = c.GetEncryptor();
+            encryptor.Should().NotBeNull("Because the keystore is initialized and there is a key");
+        }
+
+        [TestMethod]
+        public void TestAzureTableCryptoHasValidEncryptorWithUserId()
         {
             var newKey = rsaHelper.CreateNewAesSymmetricKeyset(TestUserId);
             tableManager.AddSymmetricKey(newKey);
@@ -73,6 +98,20 @@
         [TestMethod]
         public void EncryptionShouldWorkAsExpected()
         {
+            var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
+            tableManager.AddSymmetricKey(newKey);
+
+            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
+            var c = new AzureCrypto(keyStore);
+
+            var encryptedString = c.EncryptStringAndBase64(TestString);
+            encryptedString.Should().NotBeNullOrEmpty("Because the encryption failed");
+            encryptedString.Should().NotMatch(TestString);
+        }
+
+        [TestMethod]
+        public void EncryptionShouldWorkAsExpectedWithUserId()
+        {
             var newKey = rsaHelper.CreateNewAesSymmetricKeyset(TestUserId);
             tableManager.AddSymmetricKey(newKey);
 
@@ -86,6 +125,21 @@
 
         [TestMethod]
         public void DecryptionShouldReturnTheOriginalString()
+        {
+            var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
+            tableManager.AddSymmetricKey(newKey);
+
+            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
+            var c = new AzureCrypto(keyStore);
+
+            var encryptedString = c.EncryptStringAndBase64(TestString);
+            var decryptedString = c.DecryptStringFromBase64(encryptedString);
+
+            decryptedString.ShouldBeEquivalentTo(TestString);
+        }
+
+        [TestMethod]
+        public void DecryptionShouldReturnTheOriginalStringWithUserId()
         {
             var newKey = rsaHelper.CreateNewAesSymmetricKeyset(TestUserId);
             tableManager.AddSymmetricKey(newKey);

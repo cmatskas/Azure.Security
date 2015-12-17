@@ -5,8 +5,12 @@
 
     public interface ISymmetricKeyCache
     {
-        ICryptoTransform GetDecryptor(Guid userId);
+        ICryptoTransform GetDecryptor();
 
-        ICryptoTransform GetEncryptor(Guid userId);
+        ICryptoTransform GetDecryptor(Guid? userId);
+
+        ICryptoTransform GetEncryptor();
+
+        ICryptoTransform GetEncryptor(Guid? userId);
     }
 }
