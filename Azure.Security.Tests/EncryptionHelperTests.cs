@@ -26,7 +26,7 @@
         [TestCleanup]
         public void TestTearDown()
         {
-            var encryptionHelper = new EncryptionHelper(testFileDeploymentDirectory, TestUserId);
+            var encryptionHelper = new EncryptionHelper(testFileDeploymentDirectory);
             encryptionHelper.KeyTableManager.DeleteTableIfExists();
         }
 
