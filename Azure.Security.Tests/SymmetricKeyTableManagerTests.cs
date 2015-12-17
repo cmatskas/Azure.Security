@@ -66,6 +66,20 @@
         {
             var symmetricTableManager = new SymmetricKeyTableManager(TableName, acct);
             symmetricTableManager.CreateTableIfNotExists();
+            var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
+            symmetricTableManager.AddSymmetricKey(newKey);
+
+            var allKeys = symmetricTableManager.GetAllKeys().ToList();
+
+            allKeys.Should().NotBeNull("The get query failed");
+            allKeys.Count().ShouldBeEquivalentTo(1, "Insert operation failed");
+        }
+
+        [TestMethod]
+        public void GetAllKeysShouldReturnOneKeyWithUserId()
+        {
+            var symmetricTableManager = new SymmetricKeyTableManager(TableName, acct);
+            symmetricTableManager.CreateTableIfNotExists();
             var newKey = rsaHelper.CreateNewAesSymmetricKeyset(TestUserId);
             symmetricTableManager.AddSymmetricKey(newKey);
 
@@ -77,6 +91,22 @@
 
         [TestMethod]
         public void DeleteKeyShouldSucceed()
+        {
+            var symmetricTableManager = new SymmetricKeyTableManager(TableName, acct);
+            symmetricTableManager.CreateTableIfNotExists();
+            var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
+            symmetricTableManager.AddSymmetricKey(newKey);
+
+            var allKeys = symmetricTableManager.GetAllKeys().ToList();
+            allKeys.Count().ShouldBeEquivalentTo(1, "Insert operation failed");
+
+            symmetricTableManager.DeleteSymmetricKey(newKey);
+            allKeys = symmetricTableManager.GetAllKeys().ToList();
+            allKeys.Count().ShouldBeEquivalentTo(0, "Delete operation failed");
+        }
+
+        [TestMethod]
+        public void DeleteKeyShouldSucceedWithUserId()
         {
             var symmetricTableManager = new SymmetricKeyTableManager(TableName, acct);
             symmetricTableManager.CreateTableIfNotExists();

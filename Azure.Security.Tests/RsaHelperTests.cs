@@ -43,6 +43,15 @@
         {
             var directory = TestContext.DeploymentDirectory;
             var helper = new RsaHelper(Path.Combine(directory, "TestCertificate.pfx"), CertificatePassword);
+            var keySet = helper.CreateNewAesSymmetricKeyset();
+            keySet.Should().NotBeNull("Because encryption failed");
+        }
+
+        [TestMethod]
+        public void RsaHelperCreateSymmetricKeyShouldSucceedWithUserId()
+        {
+            var directory = TestContext.DeploymentDirectory;
+            var helper = new RsaHelper(Path.Combine(directory, "TestCertificate.pfx"), CertificatePassword);
             var keySet = helper.CreateNewAesSymmetricKeyset(TestUserId);
             keySet.Should().NotBeNull("Because encryption failed");
         }

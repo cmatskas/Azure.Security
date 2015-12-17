@@ -33,6 +33,13 @@
         [TestMethod]
         public void TestConstructorSucceeds()
         {
+            var encryptionHelper = new EncryptionHelper(testFileDeploymentDirectory);
+            encryptionHelper.Should().NotBeNull("Constructor failed");
+        }
+
+        [TestMethod]
+        public void TestConstructorSucceedsWithUserId()
+        {
             var encryptionHelper = new EncryptionHelper(testFileDeploymentDirectory, TestUserId);
             encryptionHelper.Should().NotBeNull("Constructor failed");
         }
