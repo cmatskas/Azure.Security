@@ -64,10 +64,11 @@
             return EncryptBytes(bytesToEncrypt, null);
         }
 
-        public byte[] EncryptBytes(byte[] bytesToEncrypt, Guid? userId)
+        public byte[] EncryptBytes(byte[] bytesToEncrypt, Guid? userId, bool createIfNotExists = true)
         {
-            //Create the master key if it doesn't exist
-            CreateNewCryptoKeyIfNotExists(userId);
+            // Create the master key if it doesn't exist, if required
+            if(createIfNotExists)
+                CreateNewCryptoKeyIfNotExists(userId);
 
             return AzureCrypto.Encrypt(bytesToEncrypt, userId);
         }
@@ -87,10 +88,11 @@
             return EncryptAndBase64(valueToEncrypt, null);
         }
 
-        public string EncryptAndBase64(string valueToEncrypt, Guid? userId)
+        public string EncryptAndBase64(string valueToEncrypt, Guid? userId, bool createIfNotExists = true)
         {
-            //Create the master key if it doesn't exist
-            CreateNewCryptoKeyIfNotExists(userId);
+            // Create the master key if it doesn't exist, if required
+            if (createIfNotExists)
+                CreateNewCryptoKeyIfNotExists(userId);
 
             return AzureCrypto.EncryptStringAndBase64(valueToEncrypt, userId);
         }
