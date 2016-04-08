@@ -1,47 +1,42 @@
 ﻿namespace Azure.Security
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Security.Cryptography;
     using Exceptions;
     using Interfaces;
+    using System;
+    using System.Security.Cryptography;
 
     public class SymmetricKeyCache : ISymmetricKeyCache
     {
-        private readonly List<SymmetricAlgorithmItem> keyCache = new List<SymmetricAlgorithmItem>();
+        private SymmetricAlgorithmItem keyCache;
         private readonly ISymmetricKeyTableManager symmetricKeyTableManager;
         private readonly IRsaHelper rsaHelper;
 
-        public SymmetricKeyCache(IRsaHelper theRsaHelper, ISymmetricKeyTableManager keyTableManager)
+        public SymmetricKeyCache(IRsaHelper theRsaHelper, ISymmetricKeyTableManager keyTableManager, Guid? userId)
         {
             rsaHelper = theRsaHelper;
             symmetricKeyTableManager = keyTableManager;
-            Init();
+            Init(userId);
         }
 
-        internal void Init()
+        internal void Init(Guid? userId)
         {
-            var allKeys = symmetricKeyTableManager.GetAllKeys();
-
-            foreach (var key in allKeys)
+            var key = symmetricKeyTableManager.GetKey(userId);
+            
+            try
             {
-                try
-                {
-                    var symmetricCryptoKey = rsaHelper.RsaDecryptToBytes(key.Key);
-                    var symmetricCryptoIv = rsaHelper.RsaDecryptToBytes(key.Iv);
+                var symmetricCryptoKey = rsaHelper.RsaDecryptToBytes(key.Key);
+                var symmetricCryptoIv = rsaHelper.RsaDecryptToBytes(key.Iv);
 
-                    var algorithm = new SymmetricAlgorithmItem
-                    {
-                        Algorithm = new AesManaged {IV = symmetricCryptoIv, Key = symmetricCryptoKey},
-                        UserId = key.UserId
-                    };
-                    keyCache.Add(algorithm);
-                }
-                catch (Exception ex)
+                var algorithm = new SymmetricAlgorithmItem
                 {
-                    throw new AzureCryptoException("Error initializing crypto key.", ex);
-                }
+                    Algorithm = new AesManaged {IV = symmetricCryptoIv, Key = symmetricCryptoKey},
+                    UserId = key.UserId
+                };
+                keyCache = algorithm;
+            }
+            catch (Exception ex)
+            {
+                throw new AzureCryptoException("Error initializing crypto key.", ex);
             }
         }
 
@@ -67,11 +62,11 @@
 
         private SymmetricAlgorithm GetAlgorithm(Guid? userId)
         {
-            if (keyCache.All(x => x.UserId != userId))
+            if (keyCache.UserId != userId)
             {
-                throw new AzureCryptoException("No keys have been configured.");
+                throw new AzureCryptoException($"No keys have been configured. KeyCache UserId: {keyCache.UserId}, userId: {userId}");
             }
-            return keyCache.Single(x => x.UserId == userId).Algorithm;
+            return keyCache.Algorithm;
         }
     }
 }

@@ -62,7 +62,7 @@
             aes.GenerateIV();
             aes.GenerateKey();
 
-            var symmKeySet = new SymmetricKey
+            var symmKeySet = new SymmetricKey(userId)
             {
                 Iv = RsaEncryptBytes(aes.IV),
                 Key = RsaEncryptBytes(aes.Key),

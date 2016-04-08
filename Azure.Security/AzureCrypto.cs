@@ -8,7 +8,7 @@
 
     public class AzureCrypto : ICrypto
     {
-        private static ISymmetricKeyCache keyStore;
+        private readonly ISymmetricKeyCache keyStore;
 
         public AzureCrypto(ISymmetricKeyCache store)
         {

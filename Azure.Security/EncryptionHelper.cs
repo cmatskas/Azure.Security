@@ -1,11 +1,10 @@
 ﻿namespace Azure.Security
 {
+    using Interfaces;
+    using Microsoft.WindowsAzure.Storage;
     using System;
     using System.Configuration;
     using System.IO;
-    using System.Linq;
-    using Interfaces;
-    using Microsoft.WindowsAzure.Storage;
 
     public class EncryptionHelper : IEncryptionHelper
     {
@@ -34,11 +33,11 @@
             KeyTableManager = new SymmetricKeyTableManager(certificateTable, StorageAccount);
             
             //Ensure the table is in place before initializing the cryptoStore
-            CreateCertificateTableIfNotExists();
+            //CreateCertificateTableIfNotExists();
             //Create the master key if it doesn't exist
             CreateNewCryptoKeyIfNotExists(userId);
 
-            KeyCache = new SymmetricKeyCache(RsaHelper, KeyTableManager);
+            KeyCache = new SymmetricKeyCache(RsaHelper, KeyTableManager, userId);
             AzureCrypto = new AzureCrypto(KeyCache);
         }
 
@@ -49,8 +48,8 @@
 
         public void CreateNewCryptoKeyIfNotExists(Guid? userId)
         {
-            var allKeys = KeyTableManager.GetAllKeys().ToList();
-            if (allKeys.Any(x => x.UserId == userId))
+            var key = KeyTableManager.GetKey(userId);
+            if (key != null)
             {
                 return;
             }

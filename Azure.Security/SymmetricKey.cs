@@ -5,10 +5,14 @@
 
     public sealed class SymmetricKey : TableEntity
     {
-        public SymmetricKey()
+        // Parameter less constructor for table queries
+        public SymmetricKey() { }
+
+        // Use the user id as the row key for faster lookup
+        public SymmetricKey(Guid? userId)
         {
             PartitionKey = "SymmetricKey";
-            RowKey = Guid.NewGuid().ToString("N");
+            RowKey = userId?.ToString("N") ?? Guid.Empty.ToString("N");
             CreateDate = DateTime.UtcNow;
         }
 
