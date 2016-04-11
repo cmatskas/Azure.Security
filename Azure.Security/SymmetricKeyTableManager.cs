@@ -6,7 +6,6 @@
     using Microsoft.WindowsAzure.Storage.Table;
     using System;
     using System.Data.Services.Client;
-    using System.Linq;
 
     public class SymmetricKeyTableManager : ISymmetricKeyTableManager
     {
@@ -38,27 +37,18 @@
 
             // Create the CloudTable object that represents the "key" table.
             var table = tableClient.GetTableReference(keyTableName);
-            
-            // Create a retrieve operation that takes a customer entity.
-            var query = new TableQuery<SymmetricKey>()
-                .Where(userId.HasValue
-                    ? TableQuery.GenerateFilterConditionForGuid("UserId", QueryComparisons.Equal, userId.Value)
-                    : TableQuery.GenerateFilterCondition("UserId", QueryComparisons.Equal, string.Empty));
 
             // Get the data using the partition and row keys (fastest way to query known data)
-            //var operation = TableOperation.Retrieve<SymmetricKey>("SymmetricKey", userId?.ToString("N") ?? Guid.Empty.ToString("N"));
+            var operation = TableOperation.Retrieve<SymmetricKey>("SymmetricKey", userId?.ToString("N") ?? Guid.Empty.ToString("N"));
 
             try
             {
-                // Get the key from the table instead
-                cachedKey = table.ExecuteQuery(query).FirstOrDefault();
-
                 // Execute the operation
-                //var result = table.Execute(operation);
+                var result = table.Execute(operation);
 
                 // If we found the data
-                //if (result.Result != null)
-                //    cachedKey = (SymmetricKey) result.Result;
+                if (result.Result != null)
+                    cachedKey = (SymmetricKey) result.Result;
             }
             catch (DataServiceQueryException dsq)
             {
