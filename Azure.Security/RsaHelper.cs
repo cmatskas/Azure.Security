@@ -14,7 +14,7 @@
 
         public RsaHelper(string certificatePath, string password)
         {
-            CreateX509CertificateFromCerFile(certificatePath, password, X509KeyStorageFlags.DefaultKeySet);
+            CreateX509CertificateFromCerFile(certificatePath, password, X509KeyStorageFlags.MachineKeySet);
         }
 
         public RsaHelper(string certificatePath, string password, X509KeyStorageFlags flag)
