@@ -80,6 +80,8 @@
 
             var deleteOperation = TableOperation.Delete(key);
             cloudTable.Execute(deleteOperation);
+
+            Cache.RemoveItem($"tablekeymanager/key/{key.UserId?.ToString() ?? "none"}");
         }
 
         public void AddSymmetricKey(SymmetricKey key)
