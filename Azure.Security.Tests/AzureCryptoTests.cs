@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Runtime.Caching;
     using Interfaces;
     using Security;
     using Exceptions;
@@ -35,12 +36,17 @@
         public void TestTearDown()
         {
             tableManager.DeleteTableIfExists();
+            MemoryCache.Default.Dispose();
         }
 
         [TestMethod]
         public void TestAzureTableCryptoInitializesSuccessfully()
         {
-            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager );
+            //Create the master key if it doesn't exist
+            var newKey = rsaHelper.CreateNewAesSymmetricKeyset(null);
+            tableManager.AddSymmetricKey(newKey);
+
+            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager, null);
             var c = new AzureCrypto(keyStore);
             Assert.IsNotNull(c);
         }
@@ -48,22 +54,34 @@
         [TestMethod]
         public void TestAzureTableCryptoThrowsTableNotFoundException()
         {
-            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
+            // Delete table to simulate empty Azure storage
+            tableManager.DeleteTableIfExists();
+            
+            Action action = () =>
+            {
+                var keyStore = new SymmetricKeyCache(rsaHelper, tableManager, null);
 
-            var c = new AzureCrypto(keyStore);
+                var c = new AzureCrypto(keyStore);
 
-            Action action = () => c.GetEncryptor();
+                c.GetEncryptor();
+            };
             action.ShouldThrow<AzureCryptoException>();
         }
 
         [TestMethod]
         public void TestAzureTableCryptoThrowsTableNotFoundExceptionWithUserId()
         {
-            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
+            // Delete table to simulate empty Azure storage
+            tableManager.DeleteTableIfExists();
+            
+            Action action = () =>
+            {
+                var keyStore = new SymmetricKeyCache(rsaHelper, tableManager, TestUserId);
 
-            var c = new AzureCrypto(keyStore);
+                var c = new AzureCrypto(keyStore);
 
-            Action action = () => c.GetEncryptor(TestUserId);
+                c.GetEncryptor(TestUserId);
+            };
             action.ShouldThrow<AzureCryptoException>();
         }
 
@@ -73,7 +91,7 @@
             var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
             tableManager.AddSymmetricKey(newKey);
 
-            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
+            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager, null);
             var c = new AzureCrypto(keyStore);
             c.Should().NotBeNull("At this stage the contstructor should have succeeded");
 
@@ -87,7 +105,7 @@
             var newKey = rsaHelper.CreateNewAesSymmetricKeyset(TestUserId);
             tableManager.AddSymmetricKey(newKey);
 
-            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
+            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager, TestUserId);
             var c = new AzureCrypto(keyStore);
             c.Should().NotBeNull("At this stage the contstructor should have succeeded");
 
@@ -101,7 +119,7 @@
             var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
             tableManager.AddSymmetricKey(newKey);
 
-            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
+            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager, null);
             var c = new AzureCrypto(keyStore);
 
             var encryptedString = c.EncryptStringAndBase64(TestString);
@@ -115,7 +133,7 @@
             var newKey = rsaHelper.CreateNewAesSymmetricKeyset(TestUserId);
             tableManager.AddSymmetricKey(newKey);
 
-            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
+            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager, TestUserId);
             var c = new AzureCrypto(keyStore);
 
             var encryptedString = c.EncryptStringAndBase64(TestString, TestUserId);
@@ -126,10 +144,10 @@
         [TestMethod]
         public void DecryptionShouldReturnTheOriginalString()
         {
-            var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
+            var newKey = rsaHelper.CreateNewAesSymmetricKeyset(null);
             tableManager.AddSymmetricKey(newKey);
 
-            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
+            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager, null);
             var c = new AzureCrypto(keyStore);
 
             var encryptedString = c.EncryptStringAndBase64(TestString);
@@ -144,7 +162,7 @@
             var newKey = rsaHelper.CreateNewAesSymmetricKeyset(TestUserId);
             tableManager.AddSymmetricKey(newKey);
 
-            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager);
+            var keyStore = new SymmetricKeyCache(rsaHelper, tableManager, TestUserId);
             var c = new AzureCrypto(keyStore);
 
             var encryptedString = c.EncryptStringAndBase64(TestString, TestUserId);

@@ -2,9 +2,11 @@
 {
     using System;
     using System.IO;
+    using System.Runtime.Caching;
     using Security;
     using FluentAssertions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.WindowsAzure.Storage;
 
     [TestClass]
     [DeploymentItem(@"TestFiles\TestCertificate.pfx")]
@@ -15,12 +17,16 @@
         private static string testFileDeploymentDirectory;
         private const string TestFileName = "TestTextFile.txt";
         private const string TestString = "This is a rendom test string";
+        private const string TableName = "TestTableName";
         private static readonly Guid TestUserId = new Guid("e6f41e92-a89f-47ab-b511-224260f3bb55");
+        private readonly CloudStorageAccount acct = CloudStorageAccount.Parse("UseDevelopmentStorage=true");
 
         [TestInitialize]
         public void TestSetup()
         {
             testFileDeploymentDirectory = TestContext.DeploymentDirectory;
+            var tableManager = new SymmetricKeyTableManager(TableName, acct);
+            tableManager.CreateTableIfNotExists();
         }
 
         [TestCleanup]
@@ -28,6 +34,7 @@
         {
             var encryptionHelper = new EncryptionHelper(testFileDeploymentDirectory);
             encryptionHelper.KeyTableManager.DeleteTableIfExists();
+            MemoryCache.Default.Dispose();
         }
 
         [TestMethod]

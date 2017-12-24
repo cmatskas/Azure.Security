@@ -2,7 +2,7 @@
 {
     using System;
     using System.IO;
-    using System.Linq;
+    using System.Runtime.Caching;
     using Exceptions;
     using FluentAssertions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -32,6 +32,7 @@
             var client = acct.CreateCloudTableClient();
             var table = client.GetTableReference(TableName);
             table.DeleteIfExists();
+            MemoryCache.Default.Dispose();
         }
 
         [TestMethod]
@@ -42,51 +43,48 @@
         }
 
         [TestMethod]
-        public void GetAllKeysShouldReturnAnEmptyArray()
+        public void GetKeyShouldReturnNull()
         {
             var symmetricTableManager = new SymmetricKeyTableManager(TableName, acct);
             symmetricTableManager.CreateTableIfNotExists();
-            var allKeys = symmetricTableManager.GetAllKeys().ToList();
+            var key = symmetricTableManager.GetKey(null);
 
-            allKeys.Should().NotBeNull("The get query failed");
-            allKeys.Count().ShouldBeEquivalentTo(0, "Query returned null or there are items in the table");
+            key.Should().BeNull("The get query did not return null as expected");
         }
 
         [TestMethod]
-        public void GetAllKeysShouldThrowAnException()
+        public void GetKeyShouldThrowAnException()
         {
             var symmetricTableManager = new SymmetricKeyTableManager(TableName, acct);
 
-            Action action = () => symmetricTableManager.GetAllKeys();
+            Action action = () => symmetricTableManager.GetKey(null);
             action.ShouldThrow<AzureCryptoException>();
         }
 
         [TestMethod]
-        public void GetAllKeysShouldReturnOneKey()
+        public void GetKeyShouldReturnOneKey()
         {
             var symmetricTableManager = new SymmetricKeyTableManager(TableName, acct);
             symmetricTableManager.CreateTableIfNotExists();
-            var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
+            var newKey = rsaHelper.CreateNewAesSymmetricKeyset(null);
             symmetricTableManager.AddSymmetricKey(newKey);
 
-            var allKeys = symmetricTableManager.GetAllKeys().ToList();
+            var key = symmetricTableManager.GetKey(null);
 
-            allKeys.Should().NotBeNull("The get query failed");
-            allKeys.Count().ShouldBeEquivalentTo(1, "Insert operation failed");
+            key.Should().NotBeNull("The get query failed");
         }
 
         [TestMethod]
-        public void GetAllKeysShouldReturnOneKeyWithUserId()
+        public void GetKeyShouldReturnOneKeyWithUserId()
         {
             var symmetricTableManager = new SymmetricKeyTableManager(TableName, acct);
             symmetricTableManager.CreateTableIfNotExists();
             var newKey = rsaHelper.CreateNewAesSymmetricKeyset(TestUserId);
             symmetricTableManager.AddSymmetricKey(newKey);
 
-            var allKeys = symmetricTableManager.GetAllKeys().ToList();
+            var key = symmetricTableManager.GetKey(TestUserId);
 
-            allKeys.Should().NotBeNull("The get query failed");
-            allKeys.Count().ShouldBeEquivalentTo(1, "Insert operation failed");
+            key.Should().NotBeNull("The get query failed");
         }
 
         [TestMethod]
@@ -94,15 +92,15 @@
         {
             var symmetricTableManager = new SymmetricKeyTableManager(TableName, acct);
             symmetricTableManager.CreateTableIfNotExists();
-            var newKey = rsaHelper.CreateNewAesSymmetricKeyset();
+            var newKey = rsaHelper.CreateNewAesSymmetricKeyset(null);
             symmetricTableManager.AddSymmetricKey(newKey);
 
-            var allKeys = symmetricTableManager.GetAllKeys().ToList();
-            allKeys.Count().ShouldBeEquivalentTo(1, "Insert operation failed");
+            var key = symmetricTableManager.GetKey(null);
+            key.Should().NotBeNull("Insert operation failed");
 
             symmetricTableManager.DeleteSymmetricKey(newKey);
-            allKeys = symmetricTableManager.GetAllKeys().ToList();
-            allKeys.Count().ShouldBeEquivalentTo(0, "Delete operation failed");
+            key = symmetricTableManager.GetKey(null);
+            key.Should().BeNull("Delete operation failed");
         }
 
         [TestMethod]
@@ -113,12 +111,12 @@
             var newKey = rsaHelper.CreateNewAesSymmetricKeyset(TestUserId);
             symmetricTableManager.AddSymmetricKey(newKey);
 
-            var allKeys = symmetricTableManager.GetAllKeys().ToList();
-            allKeys.Count().ShouldBeEquivalentTo(1, "Insert operation failed");
+            var key = symmetricTableManager.GetKey(TestUserId);
+            key.Should().NotBeNull("Insert operation failed");
 
             symmetricTableManager.DeleteSymmetricKey(newKey);
-            allKeys = symmetricTableManager.GetAllKeys().ToList();
-            allKeys.Count().ShouldBeEquivalentTo(0, "Delete operation failed");
+            key = symmetricTableManager.GetKey(TestUserId);
+            key.Should().BeNull("Delete operation failed");
         }
     }
 }
