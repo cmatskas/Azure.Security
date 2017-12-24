@@ -46,6 +46,10 @@
                 // Execute the operation
                 var result = table.Execute(operation);
 
+                // If the result returned a 404 and the table doesn't exist
+                if (result.HttpStatusCode == 404 && !table.Exists())
+                    throw new Exception("Table not found");
+
                 // If we found the data
                 if (result.Result != null)
                     cachedKey = (SymmetricKey) result.Result;
