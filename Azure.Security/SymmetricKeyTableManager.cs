@@ -1,18 +1,19 @@
 ﻿namespace Azure.Security
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Data.Services.Client;
-    using System.Linq;
     using Exceptions;
     using Interfaces;
     using Microsoft.WindowsAzure.Storage;
     using Microsoft.WindowsAzure.Storage.Table;
+    using System;
+    using System.Data.Services.Client;
 
     public class SymmetricKeyTableManager : ISymmetricKeyTableManager
     {
         private static string keyTableName;
         private readonly CloudTableClient tableClient;
+
+        // Cache helper
+        private static readonly Cache Cache = Cache.Current;
 
         public SymmetricKeyTableManager(string tableName, CloudStorageAccount storageAccount)
         {
@@ -20,17 +21,38 @@
             tableClient = storageAccount.CreateCloudTableClient();
         }
 
-        public IEnumerable<SymmetricKey> GetAllKeys()
+        public SymmetricKey GetKey(Guid? userId)
         {
-            // Create the CloudTable object that represents the "people" table.
+            // Construct a unique key
+            var itemKey = $"tablekeymanager/key/{userId?.ToString() ?? "none"}";
+
+            // Try to get the item from the cache
+            var cachedKey = Cache.GetItem<SymmetricKey>(itemKey);
+
+            // If the data was found in the cache, return it
+            if (cachedKey != null)
+            {
+                return cachedKey;
+            }
+
+            // Create the CloudTable object that represents the "key" table.
             var table = tableClient.GetTableReference(keyTableName);
 
-            // Create a retrieve operation that takes a customer entity.
-            var query = new TableQuery<SymmetricKey>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "SymmetricKey"));
+            // Get the data using the partition and row keys (fastest way to query known data)
+            var operation = TableOperation.Retrieve<SymmetricKey>("SymmetricKey", userId?.ToString("N") ?? Guid.Empty.ToString("N"));
 
             try
             {
-                return table.ExecuteQuery(query).ToList();
+                // Execute the operation
+                var result = table.Execute(operation);
+
+                // If the result returned a 404 and the table doesn't exist
+                if (result.HttpStatusCode == 404 && !table.Exists())
+                    throw new Exception("Table not found");
+
+                // If we found the data
+                if (result.Result != null)
+                    cachedKey = (SymmetricKey) result.Result;
             }
             catch (DataServiceQueryException dsq)
             {
@@ -44,6 +66,12 @@
             {
                 throw new AzureCryptoException("Could not load encryption keys table", ex);
             }
+            
+            // Add the data to the cache for 3 hours if it was found
+            if(cachedKey != null)
+                Cache.AddItem(itemKey, cachedKey);
+
+            return cachedKey;
         }
 
         public void DeleteSymmetricKey(SymmetricKey key)
@@ -52,6 +80,8 @@
 
             var deleteOperation = TableOperation.Delete(key);
             cloudTable.Execute(deleteOperation);
+
+            Cache.RemoveItem($"tablekeymanager/key/{key.UserId?.ToString() ?? "none"}");
         }
 
         public void AddSymmetricKey(SymmetricKey key)

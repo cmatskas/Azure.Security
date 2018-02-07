@@ -1,11 +1,12 @@
-﻿namespace Azure.Security.Interfaces
+﻿using System;
+
+namespace Azure.Security.Interfaces
 {
-    using System.Collections.Generic;
     using Microsoft.WindowsAzure.Storage.Table;
 
     public interface ISymmetricKeyTableManager
     {
-        IEnumerable<SymmetricKey> GetAllKeys();
+        SymmetricKey GetKey(Guid? userId);
 
         void DeleteSymmetricKey(SymmetricKey key);
 

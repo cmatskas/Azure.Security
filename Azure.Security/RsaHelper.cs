@@ -1,5 +1,6 @@
 ﻿namespace Azure.Security
 {
+    using System;
     using System.IO;
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
@@ -13,7 +14,7 @@
 
         public RsaHelper(string certificatePath, string password)
         {
-            CreateX509CertificateFromCerFile(certificatePath, password, X509KeyStorageFlags.DefaultKeySet);
+            CreateX509CertificateFromCerFile(certificatePath, password, X509KeyStorageFlags.MachineKeySet);
         }
 
         public RsaHelper(string certificatePath, string password, X509KeyStorageFlags flag)
@@ -52,14 +53,20 @@
 
         public SymmetricKey CreateNewAesSymmetricKeyset()
         {
+            return CreateNewAesSymmetricKeyset(null);
+        }
+
+        public SymmetricKey CreateNewAesSymmetricKeyset(Guid? userId)
+        {
             var aes = new AesManaged();
             aes.GenerateIV();
             aes.GenerateKey();
 
-            var symmKeySet = new SymmetricKey()
+            var symmKeySet = new SymmetricKey(userId)
             {
                 Iv = RsaEncryptBytes(aes.IV),
-                Key = RsaEncryptBytes(aes.Key)
+                Key = RsaEncryptBytes(aes.Key),
+                UserId = userId
             };
 
             return symmKeySet;
