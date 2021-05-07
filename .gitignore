@@ -173,3 +173,4 @@ build/TestResult.xml
 *.db
 
 _site/
+/.vs
