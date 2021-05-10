@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace Azure.Security
+﻿namespace Azure.Security
 {
+    using System;
     using System.Security.Cryptography;
 
     public class SymmetricAlgorithmItem

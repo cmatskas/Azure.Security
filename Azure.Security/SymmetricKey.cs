@@ -1,7 +1,7 @@
 ﻿namespace Azure.Security
 {
+    using Microsoft.Azure.Cosmos.Table;
     using System;
-    using Microsoft.WindowsAzure.Storage.Table;
 
     public sealed class SymmetricKey : TableEntity
     {

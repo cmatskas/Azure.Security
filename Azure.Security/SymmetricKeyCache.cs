@@ -7,32 +7,32 @@
 
     public class SymmetricKeyCache : ISymmetricKeyCache
     {
-        private SymmetricAlgorithmItem keyCache;
-        private readonly ISymmetricKeyTableManager symmetricKeyTableManager;
-        private readonly IRsaHelper rsaHelper;
+        private SymmetricAlgorithmItem _keyCache;
+        private readonly ISymmetricKeyTableManager _symmetricKeyTableManager;
+        private readonly IRsaHelper _rsaHelper;
 
         public SymmetricKeyCache(IRsaHelper theRsaHelper, ISymmetricKeyTableManager keyTableManager, Guid? userId)
         {
-            rsaHelper = theRsaHelper;
-            symmetricKeyTableManager = keyTableManager;
+            _rsaHelper = theRsaHelper;
+            _symmetricKeyTableManager = keyTableManager;
             Init(userId);
         }
 
         internal void Init(Guid? userId)
         {
-            var key = symmetricKeyTableManager.GetKey(userId);
+            var key = _symmetricKeyTableManager.GetKey(userId);
             
             try
             {
-                var symmetricCryptoKey = rsaHelper.RsaDecryptToBytes(key.Key);
-                var symmetricCryptoIv = rsaHelper.RsaDecryptToBytes(key.Iv);
+                var symmetricCryptoKey = _rsaHelper.RsaDecryptToBytes(key.Key);
+                var symmetricCryptoIv = _rsaHelper.RsaDecryptToBytes(key.Iv);
 
                 var algorithm = new SymmetricAlgorithmItem
                 {
                     Algorithm = new AesManaged {IV = symmetricCryptoIv, Key = symmetricCryptoKey},
                     UserId = key.UserId
                 };
-                keyCache = algorithm;
+                _keyCache = algorithm;
             }
             catch (Exception ex)
             {
@@ -62,11 +62,11 @@
 
         private SymmetricAlgorithm GetAlgorithm(Guid? userId)
         {
-            if (keyCache.UserId != userId)
+            if (_keyCache.UserId != userId)
             {
-                throw new AzureCryptoException($"No keys have been configured. KeyCache UserId: {keyCache.UserId}, userId: {userId}");
+                throw new AzureCryptoException($"No keys have been configured. KeyCache UserId: {_keyCache.UserId}, userId: {userId}");
             }
-            return keyCache.Algorithm;
+            return _keyCache.Algorithm;
         }
     }
 }

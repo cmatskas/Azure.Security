@@ -1,18 +1,18 @@
 ﻿namespace Azure.Security
 {
-    using System;
-    using System.Text;
-    using System.Security.Cryptography;
-    using System.IO;
     using Interfaces;
+    using System;
+    using System.IO;
+    using System.Security.Cryptography;
+    using System.Text;
 
     public class AzureCrypto : ICrypto
     {
-        private readonly ISymmetricKeyCache keyStore;
+        private readonly ISymmetricKeyCache _keyStore;
 
         public AzureCrypto(ISymmetricKeyCache store)
         {
-            keyStore = store;
+            _keyStore = store;
         }
 
         public string EncryptStringAndBase64(string s)
@@ -47,7 +47,7 @@
         {
             using (var msEncrypted = new MemoryStream())
             {
-                using (var encryptor = keyStore.GetEncryptor(userId))
+                using (var encryptor = _keyStore.GetEncryptor(userId))
                 {
                     using (var csEncrypt = new CryptoStream(msEncrypted, encryptor, CryptoStreamMode.Write))
                     {
@@ -69,7 +69,7 @@
 
         public byte[] Decrypt(byte[] bytes, Guid? userId)
         {
-            using (var decryptor = keyStore.GetDecryptor(userId))
+            using (var decryptor = _keyStore.GetDecryptor(userId))
             {
                 using (var msDecrypted = new MemoryStream())
                 {
@@ -89,7 +89,7 @@
 
         public ICryptoTransform GetEncryptor(Guid? userId)
         {
-            return keyStore.GetEncryptor(userId);
+            return _keyStore.GetEncryptor(userId);
         }
 
         public ICryptoTransform GetDecryptor()
@@ -99,7 +99,7 @@
 
         public ICryptoTransform GetDecryptor(Guid? userId)
         {
-            return keyStore.GetDecryptor(userId);
+            return _keyStore.GetDecryptor(userId);
         }
     }
 }
