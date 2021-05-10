@@ -2,23 +2,21 @@
 {
     using Exceptions;
     using Interfaces;
-    using Microsoft.WindowsAzure.Storage;
-    using Microsoft.WindowsAzure.Storage.Table;
+    using Microsoft.Azure.Cosmos.Table;
     using System;
-    using System.Data.Services.Client;
 
     public class SymmetricKeyTableManager : ISymmetricKeyTableManager
     {
-        private static string keyTableName;
-        private readonly CloudTableClient tableClient;
+        private static string _keyTableName;
+        private readonly CloudTableClient _tableClient;
 
         // Cache helper
         private static readonly Cache Cache = Cache.Current;
 
         public SymmetricKeyTableManager(string tableName, CloudStorageAccount storageAccount)
         {
-            keyTableName = tableName;
-            tableClient = storageAccount.CreateCloudTableClient();
+            _keyTableName = tableName;
+            _tableClient = storageAccount.CreateCloudTableClient();
         }
 
         public SymmetricKey GetKey(Guid? userId)
@@ -36,7 +34,7 @@
             }
 
             // Create the CloudTable object that represents the "key" table.
-            var table = tableClient.GetTableReference(keyTableName);
+            var table = _tableClient.GetTableReference(_keyTableName);
 
             // Get the data using the partition and row keys (fastest way to query known data)
             var operation = TableOperation.Retrieve<SymmetricKey>("SymmetricKey", userId?.ToString("N") ?? Guid.Empty.ToString("N"));
@@ -54,13 +52,9 @@
                 if (result.Result != null)
                     cachedKey = (SymmetricKey) result.Result;
             }
-            catch (DataServiceQueryException dsq)
+            catch (StorageException dsq)
             {
                 throw new AzureCryptoException("Failed to load encryption keys from storage", dsq);
-            }
-            catch (DataServiceClientException dsce)
-            {
-                throw new AzureCryptoException("Failed to load encryption keys from storage", dsce);
             }
             catch (Exception ex)
             {
@@ -94,7 +88,7 @@
 
         public CloudTable CreateTableIfNotExists()
         {
-            var cloudTable = tableClient.GetTableReference(keyTableName);
+            var cloudTable = _tableClient.GetTableReference(_keyTableName);
             cloudTable.CreateIfNotExists();
 
             return cloudTable;
@@ -102,17 +96,17 @@
 
         public void DeleteTableIfExists()
         {
-            var table = tableClient.GetTableReference(keyTableName);
+            var table = _tableClient.GetTableReference(_keyTableName);
             table.DeleteIfExists();
         }
 
         private CloudTable GetTableForOperation()
         {
-            var cloudTable = tableClient.GetTableReference(keyTableName);
+            var cloudTable = _tableClient.GetTableReference(_keyTableName);
 
             if (cloudTable == null)
             {
-                throw new AzureCryptoException(string.Format("Table {0} does not exist", keyTableName));
+                throw new AzureCryptoException(string.Format("Table {0} does not exist", _keyTableName));
             }
 
             return cloudTable;
