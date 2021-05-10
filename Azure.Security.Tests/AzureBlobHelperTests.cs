@@ -11,7 +11,6 @@
     {
         private const string DirectoryName = "testdirectory";
         private static readonly string ContainerName = Guid.NewGuid().ToString("N").ToLower();
-        private static readonly string BlobId = Guid.NewGuid().ToString("N");
         private static readonly string ConnectionString = "UseDevelopmentStorage=true";
         private const string TestString = "This is some random string used for this test";
 
@@ -45,10 +44,11 @@
         {
             var stream = Serializer.SerializeToByteArray(TestString);
             var helper = new AzureBlobHelper(ConnectionString, ContainerName);
-            helper.CreateOrUpdate(BlobId, stream);
+            var blobId = Guid.NewGuid().ToString("N");
+            helper.CreateOrUpdate(blobId, stream);
             stream.Close();
 
-            var createdSuccessfully = helper.Exists(BlobId);
+            var createdSuccessfully = helper.Exists(blobId);
             createdSuccessfully.Should().BeTrue("The blob failed to be created or uploaded");
         }
 
@@ -57,11 +57,12 @@
         {
             var stream = Serializer.SerializeToByteArray(TestString);
             var helper = new AzureBlobHelper(ConnectionString, ContainerName);
-            var blobPath = Path.Combine(DirectoryName, BlobId);
+            var blobId = Guid.NewGuid().ToString("N");
+            var blobPath = Path.Combine(DirectoryName, blobId);
             helper.CreateOrUpdate(blobPath, stream);
             stream.Close();
 
-            var createdSuccessfully = helper.Exists(BlobId);
+            var createdSuccessfully = helper.Exists(blobId);
             createdSuccessfully.Should().BeTrue("The blob failed to be created or uploaded");
         }
 
@@ -70,14 +71,15 @@
         {
             var serializedKey = Serializer.SerializeToByteArray(TestString);
             var helper = new AzureBlobHelper(ConnectionString, ContainerName);
-            helper.CreateOrUpdate(BlobId, serializedKey);
+            var blobId = Guid.NewGuid().ToString("N");
+            helper.CreateOrUpdate(blobId, serializedKey);
 
-            var createdSuccessfully = helper.Exists(BlobId);
+            var createdSuccessfully = helper.Exists(blobId);
             createdSuccessfully.Should().BeTrue("The create or upload operation failed");
 
-            helper.Delete(BlobId);
+            helper.Delete(blobId);
 
-            var blobDoesExist = helper.Exists(BlobId);
+            var blobDoesExist = helper.Exists(blobId);
             blobDoesExist.Should().BeFalse("The delete operation failed");
         }
 
@@ -94,12 +96,13 @@
         {
             var serializedKey = Serializer.SerializeToByteArray(TestString);
             var helper = new AzureBlobHelper(ConnectionString, ContainerName);
-            helper.CreateOrUpdate(BlobId, serializedKey);
+            var blobId = Guid.NewGuid().ToString("N");
+            helper.CreateOrUpdate(blobId, serializedKey);
 
-            var createdSuccessfully = helper.Exists(BlobId);
+            var createdSuccessfully = helper.Exists(blobId);
             createdSuccessfully.Should().BeTrue("The create or upload operation failed");
 
-            var stream = helper.Get(BlobId);
+            var stream = helper.Get(blobId);
             stream.Should().NotBeNull("Failed to get memory stream from blob");
 
             var deserializedObject = Serializer.DeserializeFromStream(stream);
