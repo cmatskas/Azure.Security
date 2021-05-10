@@ -1,8 +1,9 @@
 ﻿namespace Azure.Security.Interfaces
 {
+    using Azure.Storage.Blobs;
+    using Azure.Storage.Blobs.Models;
     using System.Collections.Generic;
     using System.IO;
-    using Microsoft.WindowsAzure.Storage.Blob;
 
     public interface IBlobHelper
     {
@@ -14,11 +15,11 @@
 
         void CreateOrUpdate(string blobId, Stream contentStream);
 
-        CloudBlockBlob CreateOrUpdate(string blobId, Stream contentStream, string contentType);
+        BlobClient CreateOrUpdate(string blobId, Stream contentStream, string contentType);
 
         MemoryStream Get(string blobId);
 
-        IEnumerable<IListBlobItem> GetBlobItemsByDirectory(string directoryName);
+        IEnumerable<BlobItem> GetBlobItemsByDirectory(string directoryName);
 
         bool Exists(string blobId);
     }
