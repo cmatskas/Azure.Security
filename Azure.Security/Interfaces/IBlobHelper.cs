@@ -1,7 +1,6 @@
 ﻿namespace Azure.Security.Interfaces
 {
     using Azure.Storage.Blobs;
-    using Azure.Storage.Blobs.Models;
     using System.Collections.Generic;
     using System.IO;
 
@@ -19,7 +18,7 @@
 
         MemoryStream Get(string blobId);
 
-        IEnumerable<BlobItem> GetBlobItemsByDirectory(string directoryName);
+        IEnumerable<BlobClient> GetBlobItemsByDirectory(string directoryName);
 
         bool Exists(string blobId);
     }

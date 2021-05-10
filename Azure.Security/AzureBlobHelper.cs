@@ -75,10 +75,10 @@
             return memoryStream;
         }
 
-        public IEnumerable<BlobItem> GetBlobItemsByDirectory(string directoryName)
+        public IEnumerable<BlobClient> GetBlobItemsByDirectory(string directoryName)
         {
             var flattenBlobs = _blobContainerClient.GetBlobs().ToList();
-            return flattenBlobs.Where(x => x.Name.Contains(directoryName));
+            return flattenBlobs.Where(x => x.Name.Contains(directoryName)).Select(x => _blobContainerClient.GetBlobClient(x.Name));
         }
 
         public bool Exists(string blobId)
