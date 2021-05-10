@@ -1,7 +1,7 @@
 Azure.Security
 ==============
 
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/cmatskas/Azure.Security?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/cmatskas/Azure.Security](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/cmatskas/Azure.Security?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 **Build Status** : [![Build status](https://ci.appveyor.com/api/projects/status/fyb9bs6e2d8w8xtn)](https://ci.appveyor.com/project/cmatskas/azure-security)
 
@@ -13,7 +13,7 @@ In order to get the Encryption provider to work, your project will need to provi
 
 For full details about the project and how to install and use Azure.Security you can go [here](https://cmatskas.com/a-c-encryption-provider-for-azure-websites/)
 
-###Quick Guide###
+## Quick Guide
 
 1. Add the SSL certificate file to your solution
 2. Create a storage account in Azure, if you don't have one already
