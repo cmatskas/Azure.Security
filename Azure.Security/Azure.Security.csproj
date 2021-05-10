@@ -67,6 +67,14 @@
     <None Include="web.config.install.xdt" />
     <None Include="web.config.uninstall.xdt" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs">
+      <Version>12.8.3</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Azure.Cosmos.Table">
+      <Version>1.0.8</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
