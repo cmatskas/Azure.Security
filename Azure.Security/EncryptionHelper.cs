@@ -1,7 +1,7 @@
 ﻿namespace Azure.Security
 {
     using Interfaces;
-    using Microsoft.WindowsAzure.Storage;
+    using Microsoft.Azure.Cosmos.Table;
     using System;
     using System.Configuration;
     using System.IO;
@@ -14,11 +14,11 @@
         public ISymmetricKeyCache KeyCache { get; set; }
         public ICrypto AzureCrypto{ get; set; }
 
-        private readonly string certificatePath;
-        private readonly string connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
-        private readonly string certificateValue = ConfigurationManager.AppSettings["CertificateValue"];
-        private readonly string certificateTable = ConfigurationManager.AppSettings["CertificateTable"];
-        private readonly string certificateName = ConfigurationManager.AppSettings["CertificateName"];
+        private readonly string _certificatePath;
+        private readonly string _connectionString = ConfigurationManager.AppSettings["StorageConnectionString"];
+        private readonly string _certificateValue = ConfigurationManager.AppSettings["CertificateValue"];
+        private readonly string _certificateTable = ConfigurationManager.AppSettings["CertificateTable"];
+        private readonly string _certificateName = ConfigurationManager.AppSettings["CertificateName"];
 
         public EncryptionHelper(string pathToCertificate) : this(pathToCertificate, null)
         {
@@ -27,10 +27,10 @@
 
         public EncryptionHelper(string pathToCertificate, Guid? userId)
         {
-            certificatePath = Path.Combine(pathToCertificate,certificateName);
-            StorageAccount = CloudStorageAccount.Parse(connectionString);
-            RsaHelper = new RsaHelper(certificatePath, certificateValue);
-            KeyTableManager = new SymmetricKeyTableManager(certificateTable, StorageAccount);
+            _certificatePath = Path.Combine(pathToCertificate,_certificateName);
+            StorageAccount = CloudStorageAccount.Parse(_connectionString);
+            RsaHelper = new RsaHelper(_certificatePath, _certificateValue);
+            KeyTableManager = new SymmetricKeyTableManager(_certificateTable, StorageAccount);
             
             //Ensure the table is in place before initializing the cryptoStore
             //CreateCertificateTableIfNotExists();

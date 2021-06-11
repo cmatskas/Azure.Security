@@ -1,97 +1,96 @@
 ﻿namespace Azure.Security
 {
+    using Azure.Storage.Blobs;
+    using Azure.Storage.Blobs.Models;
+    using Interfaces;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Interfaces;
-    using Microsoft.WindowsAzure.Storage;
-    using Microsoft.WindowsAzure.Storage.Blob;
 
     public class AzureBlobHelper : IBlobHelper
     {
-        private static CloudStorageAccount storageAccount;
-        private static CloudBlobContainer container;
-        private static string containerName;
+        private static BlobServiceClient _blobServiceClient;
+        private static BlobContainerClient _blobContainerClient;
+        private static string _containerName;
 
-        public AzureBlobHelper(CloudStorageAccount account, string blobContainerName)
+        public AzureBlobHelper(string connectionString, string blobContainerName)
         {
-            if (NameContailsUpperCaseCharacters(blobContainerName))
+            if (NameContainsUpperCaseCharacters(blobContainerName))
             {
                 throw new ArgumentException("The blob container name has upper case characters or spaces");
             }
 
-            containerName = blobContainerName;
-            storageAccount = account;
-            InitializeStorageAcccountAndContainer();
+            _containerName = blobContainerName;
+            _blobServiceClient = new BlobServiceClient(connectionString);
+            InitializeStorageAccountAndContainer();
         }
 
         public void DeleteBlobContainer(string toDelete = null)
         {
-            var containerToDelete = !string.IsNullOrEmpty(toDelete) ? toDelete : containerName;
-            
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            container = blobClient.GetContainerReference(containerToDelete);
+            var containerToDelete = !string.IsNullOrEmpty(toDelete) ? toDelete : _containerName;
 
-            container.DeleteIfExists();
+            _blobContainerClient = _blobServiceClient.GetBlobContainerClient(containerToDelete);
+
+            _blobContainerClient.DeleteIfExists();
         }
 
         public void Delete(string blobId)
         {
-            var blob = container.GetBlockBlobReference(blobId);
+            var blob = _blobContainerClient.GetBlobClient(blobId);
 
             blob.DeleteIfExists();
         }
 
         public void CreateOrUpdate(string blobId, MemoryStream contentStream)
         {
-            var blob = container.GetBlockBlobReference(blobId);
+            var blob = _blobContainerClient.GetBlobClient(blobId);
 
-            blob.UploadFromStream(contentStream);
+            blob.Upload(contentStream);
         }
 
         public void CreateOrUpdate(string blobId, Stream contentStream)
         {
-            var blob = container.GetBlockBlobReference(blobId);
-            blob.UploadFromStream(contentStream);
+            var blob = _blobContainerClient.GetBlobClient(blobId);
+            blob.Upload(contentStream);
         }
 
-        public CloudBlockBlob CreateOrUpdate(string blobId, Stream contentStream, string contentType)
+        public BlobClient CreateOrUpdate(string blobId, Stream contentStream, string contentType)
         {
-            var blob = container.GetBlockBlobReference(blobId);
-            blob.Properties.ContentType = contentType;
-            blob.UploadFromStream(contentStream);
+            var blob = _blobContainerClient.GetBlobClient(blobId);
+            var blobHttpHeader = new BlobHttpHeaders { ContentType = contentType };
+
+            blob.Upload(contentStream, blobHttpHeader);
 
             return blob;
         }
 
         public MemoryStream Get(string blobId)
         {
-            var blob = container.GetBlockBlobReference(blobId);
+            var blob = _blobContainerClient.GetBlobClient(blobId);
             var memoryStream = new MemoryStream();
-            blob.DownloadToStream(memoryStream);
+            blob.DownloadTo(memoryStream);
             memoryStream.Seek(0, SeekOrigin.Begin);
-                
+
             return memoryStream;
         }
 
-        public IEnumerable<IListBlobItem> GetBlobItemsByDirectory(string directoryName)
+        public IEnumerable<BlobClient> GetBlobItemsByDirectory(string directoryName)
         {
-            var flattenBlobs = container.ListBlobs(null, true).ToList();
-            return flattenBlobs.Where(x => x.StorageUri.PrimaryUri.ToString().Contains(directoryName));
-        } 
+            var flattenBlobs = _blobContainerClient.GetBlobs().ToList();
+            return flattenBlobs.Where(x => x.Name.Contains(directoryName)).Select(x => _blobContainerClient.GetBlobClient(x.Name));
+        }
 
-        public bool Exists( string blobId)
+        public bool Exists(string blobId)
         {
-            var flattenBlobs = container.ListBlobs(null, true);
+            var flattenBlobs = _blobContainerClient.GetBlobs();
             return CheckBlobExists(flattenBlobs, blobId);
         }
 
-        private bool CheckBlobExists(IEnumerable<IListBlobItem> blobList, string blobId)
+        private bool CheckBlobExists(IEnumerable<BlobItem> blobList, string blobId)
         {
-            foreach(var blobItem in blobList)
-            { 
-                var blockBlob = blobItem as CloudBlockBlob;
+            foreach (var blockBlob in blobList)
+            {
                 if (blockBlob == null)
                 {
                     continue;
@@ -106,17 +105,16 @@
             return false;
         }
 
-        private static bool NameContailsUpperCaseCharacters(string stringToValidate)
+        private static bool NameContainsUpperCaseCharacters(string stringToValidate)
         {
             return !string.IsNullOrEmpty(stringToValidate) && stringToValidate.Any(char.IsUpper);
         }
 
-        private static void InitializeStorageAcccountAndContainer()
+        private static void InitializeStorageAccountAndContainer()
         {
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            container = blobClient.GetContainerReference(containerName);
+            _blobContainerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
 
-            container.CreateIfNotExists();
+            _blobContainerClient.CreateIfNotExists();
         }
     }
 }

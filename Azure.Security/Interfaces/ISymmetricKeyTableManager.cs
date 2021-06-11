@@ -2,7 +2,7 @@
 
 namespace Azure.Security.Interfaces
 {
-    using Microsoft.WindowsAzure.Storage.Table;
+    using Microsoft.Azure.Cosmos.Table;
 
     public interface ISymmetricKeyTableManager
     {

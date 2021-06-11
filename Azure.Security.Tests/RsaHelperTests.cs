@@ -1,10 +1,10 @@
 ﻿namespace Azure.Security.Tests
 {
+    using FluentAssertions;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.IO;
     using System.Security.Cryptography;
-    using FluentAssertions;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     [DeploymentItem(@"TestFiles\TestCertificate.pfx")]
@@ -35,7 +35,7 @@
             var result = helper.RsaEncryptString(TestString);
 
             var decryptedValue = helper.RsaDecryptToString(result);
-            decryptedValue.ShouldBeEquivalentTo(TestString, "Because the rsa decryption failed.");
+            decryptedValue.Should().BeEquivalentTo(TestString, "Because the rsa decryption failed.");
         }
 
         [TestMethod]
@@ -78,8 +78,8 @@
             var decryptedKeyBytes = helper.RsaDecryptToBytes(encryptedKeyBytes);
             var decryptedIvBytes = helper.RsaDecryptToBytes(encryptedIvBytes);
 
-            originalKey.ShouldBeEquivalentTo(decryptedKeyBytes);
-            originalIv.ShouldBeEquivalentTo(decryptedIvBytes);
+            originalKey.Should().BeEquivalentTo(decryptedKeyBytes);
+            originalIv.Should().BeEquivalentTo(decryptedIvBytes);
         }
     }
 }

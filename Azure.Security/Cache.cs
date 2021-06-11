@@ -59,8 +59,8 @@
             // Return the item or null
             if (obj != null)
                 return (T)(obj);
-            else
-                return default(T);
+            
+            return default;
         }
 
         /// <summary>

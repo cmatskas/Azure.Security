@@ -173,3 +173,5 @@ build/TestResult.xml
 *.db
 
 _site/
+/.vs
+/Azure.Security/.vs/Azure.Security/v16/TestStore/0

@@ -1,16 +1,16 @@
 ﻿namespace Azure.Security
 {
+    using Interfaces;
     using System;
     using System.IO;
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
     using System.Text;
-    using Interfaces;
 
     public class RsaHelper : IRsaHelper
     {
         private static readonly UnicodeEncoding ByteConverter = new UnicodeEncoding();
-        private X509Certificate2 x509;
+        private X509Certificate2 _x509;
 
         public RsaHelper(string certificatePath, string password)
         {
@@ -25,7 +25,7 @@
         private void CreateX509CertificateFromCerFile(string certificateFilePath, string password, X509KeyStorageFlags flag)
         {
             var data = File.ReadAllBytes(certificateFilePath);
-            x509 = new X509Certificate2(data, password, flag);
+            _x509 = new X509Certificate2(data, password, flag);
         }
 
         public byte[] RsaEncryptString(string plainText)
@@ -36,13 +36,13 @@
 
         public byte[] RsaEncryptBytes(byte[] binaryData)
         {
-            var rsa = (RSACryptoServiceProvider) x509.PublicKey.Key;
+            var rsa = (RSACryptoServiceProvider) _x509.PublicKey.Key;
             return rsa.Encrypt(binaryData, false);
         }
 
         public byte[] RsaDecryptToBytes(byte[] dataToDecrypt)
         {
-            var rsa = (RSACryptoServiceProvider) x509.PrivateKey;
+            var rsa = (RSACryptoServiceProvider) _x509.PrivateKey;
             return rsa.Decrypt(dataToDecrypt, false);
         }
 
@@ -62,14 +62,14 @@
             aes.GenerateIV();
             aes.GenerateKey();
 
-            var symmKeySet = new SymmetricKey(userId)
+            var symmetricKeySet = new SymmetricKey(userId)
             {
                 Iv = RsaEncryptBytes(aes.IV),
                 Key = RsaEncryptBytes(aes.Key),
                 UserId = userId
             };
 
-            return symmKeySet;
+            return symmetricKeySet;
         }
     }
 }
